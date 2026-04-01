@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pegada de Carbono — Planton</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Planton Design Tokens ── */
+:root {
+  --forest:   #145559;
+  --dark:     #0A2D30;
+  --accent:   #ADCF78;
+  --cream:    #F7F3DB;
+  --ink:      #191919;
+  --muted:    #6B7280;
+  --white:    #FFFFFF;
+  --surface-card: #F0F4F0;
+  --surface-dark: #0A2D30;
+  --surface-forest: #145559;
+  --border:   #D6E4D6;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',sans-serif;background:#FFFFFF;color:var(--ink);font-size:14px;line-height:1.6}
+
+/* ── Topbar ── */
+.topbar{background:var(--dark);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.topbar-logo{display:flex;align-items:center;gap:10px}
+.topbar-divider{width:1px;height:20px;background:rgba(255,255,255,.15)}
+.topbar-title{font-size:13px;color:rgba(255,255,255,.6);font-weight:400}
+
+/* ── Layout ── */
+.layout{display:flex;min-height:calc(100vh - 50px)}
+.sidebar{width:232px;background:var(--surface-card);border-right:1px solid var(--border);padding:1.5rem 1rem;flex-shrink:0}
+.sidebar-section{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);padding:0 .5rem;margin:.9rem 0 .4rem}
+.sidebar-section:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--muted);margin-bottom:2px;transition:all .15s;user-select:none;font-family:'Space Grotesk',sans-serif}
+.nav-item:hover{background:rgba(20,85,89,.07);color:var(--forest)}
+.nav-item.active{background:var(--forest);color:#fff;font-weight:500}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.nav-item.active .nav-dot{background:var(--accent)}
+.nav-divider{height:1px;background:var(--border);margin:.6rem 0}
+.main{flex:1;padding:2.5rem 2rem;max-width:980px}
+.page{display:none}.page.active{display:block}
+
+/* ── Page header ── */
+.page-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:.4rem}
+.page-header h2{font-size:28px;font-weight:400;color:var(--forest);line-height:1.2;margin-bottom:.4rem}
+.page-header p{font-size:14px;color:var(--muted);margin-bottom:1.5rem}
+
+/* ── Cards ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem}
+.card-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:.75rem}
+.card-title{font-size:16px;font-weight:500;color:var(--forest);margin-bottom:1rem}
+.locked-banner{background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:.65rem 1rem;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:1.25rem}
+.locked-banner svg{width:14px;height:14px;stroke:var(--forest);fill:none;stroke-width:2;flex-shrink:0}
+
+/* ── Tables ── */
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:8px 10px;border-bottom:1px solid var(--border);text-align:right}
+thead th:first-child{text-align:left}
+tbody tr{border-bottom:1px solid var(--surface-card)}
+tbody tr:last-child{border-bottom:none}
+tbody td{padding:10px;vertical-align:middle;color:var(--ink)}
+tfoot td{padding:10px;background:var(--surface-card);font-weight:600;border-top:1px solid var(--border);color:var(--forest)}
+
+/* ── Inputs ── */
+input[type=number],input[type=text],select{
+  font-family:'Space Grotesk',sans-serif;font-size:13px;padding:6px 10px;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:#fff;color:var(--ink);outline:none;transition:border .15s}
+input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--forest)}
+input[type=number]{text-align:right}
+
+/* ── Buttons ── */
+.btn{font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;color:var(--ink);cursor:pointer;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-card);border-color:var(--forest)}
+.btn-primary{background:var(--forest);color:#fff;border-color:var(--forest)}
+.btn-primary:hover{background:var(--dark);border-color:var(--dark)}
+.btn-accent{background:var(--accent);color:var(--dark);border-color:var(--accent)}
+.btn-accent:hover{background:#9cbd5e;border-color:#9cbd5e}
+.btn-sm{font-size:12px;padding:4px 12px}
+.btn-ghost{background:transparent;color:var(--muted);border-color:transparent}
+.btn-ghost:hover{background:var(--surface-card);color:var(--forest);border-color:var(--border)}
+.btn-danger{color:#a32d2d;border-color:#f7c1c1;background:#fff}
+.btn-danger:hover{background:#fcebeb}
+
+/* ── Badges ── */
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;letter-spacing:.03em}
+.badge-forest{background:rgba(20,85,89,.1);color:var(--forest)}
+.badge-accent{background:rgba(173,207,120,.25);color:#3a5c10}
+.badge-amber{background:#faeeda;color:#854f0b}
+.badge-muted{background:var(--surface-card);color:var(--muted)}
+
+/* ── Alerts ── */
+.alert{border-radius:var(--radius-md);padding:.7rem 1rem;font-size:12px;margin-top:.75rem;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.alert-warning{background:#fffbeb;color:#854f0b;border:1px solid #fde68a}
+.alert-danger{background:#fef2f2;color:#a32d2d;border:1px solid #fca5a5}
+.alert-success{background:rgba(173,207,120,.15);color:#2d5a10;border:1px solid var(--accent)}
+.alert-info{background:rgba(20,85,89,.06);color:var(--forest);border:1px solid rgba(20,85,89,.2)}
+
+/* ── Result card (dark) ── */
+.result-card{background:var(--dark);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;color:#fff}
+.result-card .card-label{color:var(--accent)}
+.metrics{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.25rem}
+.metric{flex:1;min-width:130px;background:rgba(255,255,255,.06);border-radius:var(--radius-md);padding:.9rem 1rem;border:1px solid rgba(255,255,255,.08)}
+.metric.highlight{background:var(--forest);border-color:var(--forest)}
+.metric .m-label{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.metric.highlight .m-label{color:var(--accent)}
+.metric .m-val{font-size:24px;font-weight:400;color:#fff;line-height:1.1}
+.metric .m-unit{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
+.metric.highlight .m-unit{color:rgba(255,255,255,.6)}
+.result-table thead th{color:rgba(255,255,255,.4);border-bottom-color:rgba(255,255,255,.1)}
+.result-table tbody tr{border-bottom-color:rgba(255,255,255,.06)}
+.result-table tfoot td{background:rgba(255,255,255,.06);color:#fff;border-top-color:rgba(255,255,255,.1)}
+
+/* ── Product tabs ── */
+.prod-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+.prod-tab{font-size:12px;font-family:'Space Grotesk',sans-serif;font-weight:500;padding:6px 16px;border-radius:20px;border:1px solid var(--border);cursor:pointer;color:var(--muted);background:#fff;transition:all .15s}
+.prod-tab:hover{border-color:var(--forest);color:var(--forest)}
+.prod-tab.active{background:var(--forest);color:#fff;border-color:var(--forest)}
+.prod-tab-add{border-style:dashed;color:var(--forest);border-color:var(--accent)}
+.prod-tab-add:hover{background:rgba(173,207,120,.1)}
+
+/* ── Base block ── */
+.base-block{border:1px solid var(--border);border-radius:var(--radius-md);padding:1.25rem;margin-bottom:.75rem;background:var(--surface-card)}
+.base-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;flex-wrap:wrap;gap:8px}
+
+/* ── Rule box ── */
+.rule-box{background:rgba(20,85,89,.05);border:1px solid rgba(20,85,89,.15);border-radius:var(--radius-md);padding:.65rem 1rem;font-size:12px;color:var(--forest);margin-bottom:1rem;display:flex;gap:8px;line-height:1.5}
+
+/* ─ Login Screen ─ */
+#login-screen{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(ellipse at 60% 30%, rgba(255,180,60,0.38) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 80%, rgba(20,85,55,0.55) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 75%, rgba(10,45,30,0.5) 0%, transparent 45%),
+    linear-gradient(160deg, #0b2a1e 0%, #1a4a2e 30%, #2d6a40 55%, #3d7a4a 70%, #1a3d2a 100%);
+  overflow:hidden;
+}
+#login-screen::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 55% 28%, rgba(255,200,80,0.22) 0%, transparent 40%),
+    radial-gradient(circle at 30% 60%, rgba(60,120,60,0.18) 0%, transparent 35%);
+  pointer-events:none;
+}
+#login-screen::after{
+  content:"";position:absolute;bottom:0;left:0;right:0;height:45%;
+  background:linear-gradient(to top, rgba(5,20,12,0.55) 0%, transparent 100%);
+  pointer-events:none;
+}
+.login-box{
+  position:relative;z-index:2;
+  background:rgba(5,18,12,0.72);
+  border:1px solid rgba(173,207,120,0.25);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  padding:48px 52px;
+  width:100%;max-width:400px;
+  box-shadow:0 24px 80px rgba(0,0,0,0.55);
+  text-align:center;
+}
+.login-logo{margin-bottom:32px;display:flex;justify-content:center;}
+.login-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--cream);margin-bottom:6px;line-height:1.3;}
+.login-subtitle{font-family:monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(173,207,120,0.7);margin-bottom:36px;}
+.login-label{font-family:monospace;font-size:10px;font-weight:600;letter-spacing:.10em;text-transform:uppercase;color:rgba(247,243,219,0.5);display:block;margin-bottom:10px;}
+#login-input{
+  width:100%;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(173,207,120,0.30);
+  color:var(--cream);
+  font-family:monospace;font-size:22px;font-weight:600;letter-spacing:.18em;
+  text-align:center;padding:14px 16px;
+  outline:none;transition:border-color .2s;
+}
+#login-input:focus{border-color:var(--accent);}
+#login-input::placeholder{color:rgba(247,243,219,0.20);letter-spacing:.10em;font-size:16px;}
+#login-btn{
+  margin-top:20px;width:100%;
+  background:var(--accent);color:var(--dark);
+  border:none;cursor:pointer;
+  font-family:monospace;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  padding:14px;transition:background .2s,transform .1s;
+}
+#login-btn:hover{background:#c0e08a;}
+#login-btn:active{transform:scale(0.98);}
+#login-error{
+  margin-top:14px;font-family:monospace;font-size:11px;
+  color:#ff6b6b;min-height:16px;letter-spacing:.04em;opacity:0;transition:opacity .25s;
+}
+#login-error.visible{opacity:1;}
+.login-footer-text{margin-top:28px;font-family:monospace;font-size:9px;color:rgba(255,255,255,0.18);letter-spacing:.08em;text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="110" height="24" viewBox="0 0 2356 507" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M973.65 296.62H922.75V426.9C922.75 469.1 956.96 503.3 999.15 503.3H1086.24V461.35H973.65V296.62Z" fill="#ADCF78"/>
+        <path d="M1166.71 315.03L1096.74 503.3H1144.25L1160.91 458.88H1260.24L1276.9 503.3H1327.18L1249.75 296.62H1193.19C1181.38 296.62 1170.82 303.96 1166.71 315.03ZM1176.02 418.16L1201.78 348.64C1203.54 343.89 1208.07 340.73 1213.14 340.73H1216.12L1245.12 418.16H1176.02Z" fill="#ADCF78"/>
+        <path d="M1418.85 296.62H1367.95V503.3H1418.85V296.62Z" fill="#ADCF78"/>
+        <path d="M1564.71 296.62H1508.15C1496.35 296.62 1485.79 303.96 1481.67 315.03L1411.7 503.3H1459.21L1475.87 458.88H1575.2L1591.86 503.3H1642.14L1564.71 296.62ZM1491.37 418.16L1517.13 348.64C1518.89 343.89 1523.42 340.73 1528.49 340.73H1531.47L1560.47 418.16H1491.37Z" fill="#ADCF78"/>
+        <path d="M1779.14 296.62H1728.24V421.05L1634.23 296.62H1597.97V503.3H1648.87V374.2L1746.14 503.3H1779.14V296.62Z" fill="#ADCF78"/>
+        <path d="M922.75 3.7H871.85V210.38H922.75V3.7Z" fill="#ADCF78"/>
+        <path d="M1086.24 3.7H1035.34V210.38H1086.24V3.7Z" fill="#ADCF78"/>
+        <path d="M1086.24 86.36H922.75V127.72H1086.24V86.36Z" fill="#ADCF78"/>
+        <path d="M357.32 3.7H217.93C175.73 3.7 141.53 37.91 141.53 80.1V133.99C141.53 176.19 175.73 210.39 217.93 210.39H357.32C399.52 210.39 433.72 176.18 433.72 133.99V80.1C433.72 37.9 399.51 3.7 357.32 3.7ZM382.77 133.99C382.77 148.08 371.41 159.44 357.32 159.44H217.93C203.84 159.44 192.48 148.08 192.48 133.99V80.1C192.48 66.01 203.84 54.65 217.93 54.65H357.32C371.41 54.65 382.77 66.01 382.77 80.1V133.99Z" fill="#ADCF78"/>
+        <path d="M730.09 3.7H590.7C548.5 3.7 514.3 37.91 514.3 80.1V133.99C514.3 176.19 548.5 210.39 590.7 210.39H679.14V296.61H730.09V3.7ZM679.14 159.43H590.7C576.61 159.43 565.25 148.07 565.25 133.98V80.09C565.25 66 576.61 54.64 590.7 54.64H679.14V159.43Z" fill="#ADCF78"/>
+        <path d="M141.53 296.62H0V503.3H141.53C183.73 503.3 217.93 469.09 217.93 426.9V372.99C217.93 330.82 183.73 296.62 141.53 296.62ZM166.98 426.9C166.98 440.99 155.62 452.35 141.53 452.35H50.95V347.57H141.53C155.62 347.57 166.98 358.93 166.98 372.99V426.9Z" fill="#ADCF78"/>
+        <path d="M433.72 296.62H217.93V347.57H433.72V296.62Z" fill="#ADCF78"/>
+        <path d="M433.72 399.96H217.93V452.35H433.72V399.96Z" fill="#ADCF78"/>
+        <path d="M433.72 452.35H217.93V503.3H433.72V452.35Z" fill="#ADCF78"/>
+        <path d="M730.09 296.62H514.3V347.57H730.09V296.62Z" fill="#ADCF78"/>
+        <path d="M730.09 399.96H514.3V503.3H730.09V399.96Z" fill="#ADCF78"/>
+        <path d="M871.85 296.62H679.14V347.57H871.85V296.62Z" fill="#ADCF78"/>
+        <path d="M871.85 399.96H679.14V452.35H871.85V399.96Z" fill="#ADCF78"/>
+        <path d="M871.85 452.35H679.14V503.3H871.85V452.35Z" fill="#ADCF78"/>
+        <path d="M2355.95 3.7H2145.23L2052.4 128.14L1959.57 3.7H1748.85L1948.1 267.52V503.3H2156.7V267.52L2355.95 3.7Z" fill="#ADCF78"/>
+      </svg>
+    </div>
+    <div class="login-title">Pegada de Carbono — Synergy</div>
+    <div class="login-subtitle">Documento Confidencial · Planton</div>
+    <label class="login-label" for="login-input">Código de Acesso</label>
+    <input id="login-input" type="text" inputmode="numeric" maxlength="8" placeholder="_ _ . _ _ _" autocomplete="off" spellcheck="false">
+    <div id="login-error">Código incorreto. Tente novamente.</div>
+    <button id="login-btn">Acessar</button>
+    <div class="login-footer-text">Synergy · Abril 2026</div>
+  </div>
+</div>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">
+      <svg height="28" viewBox="0 0 2356 507" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block">
+        <path d="M973.65 296.62H922.75V426.9C922.75 469.1 956.96 503.3 999.15 503.3H1086.24V461.35H973.65V296.62Z" fill="#ACCF77"/>
+        <path d="M1166.71 315.03L1096.74 503.3H1144.25L1160.91 458.88H1260.24L1276.9 503.3H1327.18L1249.75 296.62H1193.19C1181.38 296.62 1170.82 303.96 1166.71 315.03ZM1176.02 418.16L1201.78 348.64C1203.54 343.89 1208.07 340.73 1213.14 340.73H1216.12L1245.12 418.16H1176.02Z" fill="#ACCF77"/>
+        <path d="M1501.67 435.74H1494.88L1408.51 296.62H1341.26V498.66C1341.26 501.22 1343.34 503.3 1345.9 503.3H1387.84V364.18H1394.94L1481.31 503.3H1548.56V305.35C1548.56 300.53 1544.65 296.62 1539.83 296.62H1501.67V435.74Z" fill="#ACCF77"/>
+        <path d="M1572.93 338.57H1650.05V489.93C1650.05 497.31 1656.04 503.3 1663.42 503.3H1700.95V338.57H1760.93L1778.07 296.62H1572.93V338.57Z" fill="#ACCF77"/>
+        <path d="M1910.79 293.84H1900.46C1824.88 293.84 1764.73 330.24 1764.73 395.02V404.89C1764.73 470.29 1824.88 506.07 1900.46 506.07H1910.79C1984.82 506.07 2043.74 470.29 2043.74 404.89V395.02C2043.74 330.24 1984.82 293.84 1910.79 293.84ZM1988.22 404.89C1988.22 440.37 1957.06 459.49 1908.32 459.49H1900.46C1851.72 459.49 1820.56 440.36 1820.56 404.89V395.02C1820.56 359.85 1851.72 340.42 1900.46 340.42H1908.32C1957.06 340.42 1988.22 359.85 1988.22 395.02V404.89Z" fill="#ACCF77"/>
+        <path d="M2228.73 302.03V435.75H2221.94L2135.56 296.63H2068.31V499.53C2068.31 501.62 2070 503.31 2072.09 503.31H2114.89V364.19H2121.99L2208.36 503.31H2275.61V296.63H2234.13C2231.14 296.63 2228.72 299.05 2228.72 302.04L2228.73 302.03Z" fill="#ACCF77"/>
+        <path d="M827.12 296.619H713.6V501.689C713.6 502.579 714.32 503.299 715.21 503.299H764.5V435.429H827.12C882.34 435.429 904.55 411.679 904.55 371.269V360.469C904.55 320.369 882.34 296.619 827.12 296.619ZM853.03 370.039C853.03 387.319 842.85 393.489 822.8 393.489H764.5V338.579H822.8C842.85 338.579 853.03 345.059 853.03 361.719V370.049V370.039Z" fill="#ACCF77"/>
+        <path d="M2337.58 314.559C2337.58 312.049 2335.93 310.499 2333.19 310.499H2326.23V318.619H2333.19C2335.93 318.619 2337.58 317.099 2337.58 314.559Z" fill="#ACCF77"/>
+        <path d="M2331.46 295.449C2318.33 295.449 2307.69 306.089 2307.69 319.219C2307.69 332.349 2318.33 342.989 2331.46 342.989C2344.59 342.989 2355.23 332.349 2355.23 319.219C2355.23 306.089 2344.59 295.449 2331.46 295.449ZM2337.65 330.039L2330.95 322.149H2326.26V330.039H2322.4V306.929H2333.23C2338.18 306.929 2341.42 309.969 2341.42 314.549C2341.42 318.379 2339.14 321.119 2335.45 321.909L2342.48 330.029H2337.66L2337.65 330.039Z" fill="#ACCF77"/>
+        <path d="M465.87 0.0300293H39.25C17.57 0.0300293 0 17.6 0 39.28V464.05C0 485.73 17.57 503.3 39.25 503.3H92.4099L38.8899 264.48C34.3199 244.1 38.0498 222.73 49.3398 205.16C54.1798 197.63 60.2199 189.57 67.6199 181.84L76.96 230.88L68.96 180.47C76.72 172.58 85.91 165.1 96.72 158.95L116.95 286.4L100.5 156.89C108.9 152.51 118.22 148.95 128.53 146.6L153.15 340.52L134.57 145.37C141.11 144.22 148.03 143.54 155.34 143.44C157.55 143.41 159.74 143.44 161.93 143.5L185.73 393.42L169.89 143.9C178.78 144.56 187.47 145.9 195.91 147.78L214.79 445.19L205.42 150.15C213.81 152.46 221.93 155.27 229.73 158.43L240.45 496.02V163.07C248.29 166.68 255.75 170.6 262.79 174.65V503.29H264.15L274.36 181.63C281.7 186.27 288.46 190.94 294.59 195.41L284.82 503.29H287.75L306.72 204.57C314.32 210.51 320.42 215.61 324.8 219.1L306.76 503.29H311.24L337.43 228.24C342.01 231.43 347.48 235.12 353.77 238.91L328.59 503.28H334.61L367.23 246.42C371.87 248.8 376.82 251.12 382.07 253.28L350.32 503.28H357.89L396.73 258.57C401.07 259.92 405.57 261.14 410.23 262.16L371.96 503.28H381.07L426.49 264.84C428.6 265.08 430.73 265.29 432.89 265.44C434.95 265.58 436.9 265.61 438.78 265.55L393.5 503.28H406.31L460.62 258.88C468.55 254.02 472.86 247.2 475.02 242.54L417.08 503.27H465.89C487.57 503.27 505.14 485.7 505.14 464.02V39.25C505.14 17.57 487.57 0 465.89 0L465.87 0.0300293Z" fill="#ACCF77"/>
+      </svg>
+    </div>
+    <div class="topbar-divider"></div>
+    <span class="topbar-title">Calculadora de Pegada de Carbono</span>
+  </div>
+</div>
+
+<div class="layout">
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-section">Referência</div>
+  <div class="nav-item active" onclick="showPage('pg-ref')"><div class="nav-dot"></div>Fatores de emissão</div>
+  <div class="nav-divider"></div>
+  <div class="sidebar-section">Produtos</div>
+  <div class="nav-item" onclick="showPage('pg-prod')"><div class="nav-dot"></div>Calcular produto final</div>
+  <div class="nav-divider"></div>
+  <div class="nav-item" onclick="showPage('pg-info')"><div class="nav-dot"></div>Como usar</div>
+</aside>
+
+<main class="main">
+
+<!-- ── Página: Fatores ── -->
+<div class="page active" id="pg-ref">
+  <div class="page-header">
+    <div class="page-label">Referência</div>
+    <h2>Fatores de emissão</h2>
+    <p>Valores obtidos do estudo de pegada de carbono realizado pela Planton. Estes dados são fixos e não podem ser alterados.</p>
+  </div>
+  <div class="locked-banner">
+    <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    Dados bloqueados — fornecidos pelo Estudo de Pegada de Carbono Planton, ano base 2025.
+  </div>
+  <div class="card">
+    <div class="card-label">Matérias-primas</div>
+    <div class="card-title">kg CO₂e / kg de matéria-prima</div>
+    <table>
+      <thead><tr><th>Matéria-prima</th><th style="text-align:right">Emissão (kg CO₂e/kg)</th><th style="text-align:right">Fonte</th></tr></thead>
+      <tbody>
+        <tr><td>Maltodextrina</td><td style="text-align:right;font-weight:500">2,061</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Amido de Milho</td><td style="text-align:right;font-weight:500">2,041</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Goma Arábica</td><td style="text-align:right;font-weight:500">0,976</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Propilenoglicol</td><td style="text-align:right;font-weight:500">5,078</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Álcool Etílico</td><td style="text-align:right;font-weight:500">0,089</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Triacetina</td><td style="text-align:right;font-weight:500">3,334</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Cacau em Pó Alcalino</td><td style="text-align:right;font-weight:500">24,802</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-label">Processos produtivos</div>
+    <div class="card-title">kg CO₂e / kg de produto</div>
+    <table>
+      <thead><tr><th>Processo</th><th style="text-align:right">Emissão (kg CO₂e/kg)</th><th style="text-align:right">Fonte</th></tr></thead>
+      <tbody>
+        <tr><td>Processo Aroma Líquido</td><td style="text-align:right;font-weight:500">0,763</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Processo Aroma Líquido Emulsão</td><td style="text-align:right;font-weight:500">0,778</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Processo Aroma em Pó</td><td style="text-align:right;font-weight:500">0,733</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+        <tr><td>Processo Aroma em Pó — Spray Dryer</td><td style="text-align:right;font-weight:500">0,833</td><td style="text-align:right;color:var(--muted);font-size:12px">Estudo Planton</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="display:flex;justify-content:flex-end">
+    <button class="btn btn-primary" onclick="showPage('pg-prod')">Calcular produto final →</button>
+  </div>
+</div>
+
+<!-- ── Página: Produto ── -->
+<div class="page" id="pg-prod">
+  <div class="page-header">
+    <div class="page-label">Produtos</div>
+    <h2>Calcular produto final</h2>
+    <p>Configure a composição de cada produto e obtenha a pegada de carbono resultante.</p>
+  </div>
+  <div class="prod-tabs" id="prod-tabs"></div>
+  <div id="prod-content"></div>
+</div>
+
+<!-- ── Página: Info ── -->
+<div class="page" id="pg-info">
+  <div class="page-header">
+    <div class="page-label">Guia</div>
+    <h2>Como usar</h2>
+    <p>Entenda a estrutura de cálculo e as regras da calculadora.</p>
+  </div>
+  <div class="card">
+    <div class="card-label">Fluxo de trabalho</div>
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0">1</div>
+        <div><strong style="color:var(--forest)">Bases intermediárias</strong><br><span style="font-size:13px;color:var(--muted)">Se o produto utiliza um processo intermediário (ex: um aroma líquido que entra no produto final), configure-o como uma base. Selecione o processo produtivo e informe a composição de matérias-primas.</span></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0">2</div>
+        <div><strong style="color:var(--forest)">Produto principal</strong><br><span style="font-size:13px;color:var(--muted)">Configure o processo principal e a composição do produto final. As bases criadas no passo anterior aparecem como ingredientes disponíveis.</span></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--dark);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0">✓</div>
+        <div><strong style="color:var(--forest)">Resultado</strong><br><span style="font-size:13px;color:var(--muted)">A pegada total é calculada automaticamente somando contribuições das matérias-primas, bases intermediárias e processos, com extrapolação para 100%.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Regra dos 80% e Extrapolação</div>
+    <div class="rule-box" style="margin-bottom:0">
+      <span>ℹ</span>
+      <div>A soma dos percentuais das matérias-primas <strong>com fator de emissão conhecido</strong> deve ser ≥ 80% da formulação. O campo <em>"Outros"</em> não conta para este critério.<br><br>
+      <strong>Extrapolação para 100%:</strong> a emissão das MPs mapeadas é dividida pela fração coberta (ex: 81,5% → ÷ 0,815) e aplicada sobre 100%, garantindo que os percentuais não mapeados não sejam ignorados — abordagem alinhada ao GHG Protocol / ISO 14067.</div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ═══════════════════ LOGIN ═══════════════════
+(function(){
+  const CODE = "039454";
+  const screen = document.getElementById('login-screen');
+  const input  = document.getElementById('login-input');
+  const btn    = document.getElementById('login-btn');
+  const err    = document.getElementById('login-error');
+
+  function tryLogin(){
+    const val = input.value.trim();
+    if(val === CODE){
+      screen.style.transition = "opacity 0.5s ease";
+      screen.style.opacity = "0";
+      setTimeout(()=>{ screen.style.display = "none"; }, 500);
+    } else {
+      err.classList.add("visible");
+      input.style.borderColor = "#ff6b6b";
+      setTimeout(()=>{ err.classList.remove("visible"); input.style.borderColor = ""; }, 2200);
+      input.select();
+    }
+  }
+
+  btn.addEventListener('click', tryLogin);
+  input.addEventListener('keydown', e=>{ if(e.key === 'Enter') tryLogin(); });
+})();
+
+const CF_MP = {
+  "Maltodextrina":2.061,"Amido de Milho":2.041,"Goma Arábica":0.976,
+  "Propilenoglicol":5.078,"Álcool Etílico":0.089,"Triacetina":3.334,
+  "Cacau em Pó Alcalino":24.802
+};
+const MP_NAMES = Object.keys(CF_MP);
+const CF_PROC = {
+  p1:{label:"Processo Aroma Líquido",val:0.763},
+  p2:{label:"Processo Aroma Líquido Emulsão",val:0.778},
+  p3:{label:"Processo Aroma em Pó",val:0.733},
+  p4:{label:"Processo Aroma em Pó — Spray Dryer",val:0.833}
+};
+const PROC_IDS = Object.keys(CF_PROC);
+
+let products=[{id:"prod1",name:"BR-26278 — Aroma Natural de Cacau em Pó",
+  bases:[],mainProcId:"p3",
+  mainComp:Object.fromEntries(MP_NAMES.map(m=>[m,""])),
+  mainOthers:"",mainBases:{}}];
+let activeProd="prod1";
+let prodCounter=2, baseCounter=1;
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const map={'pg-ref':0,'pg-prod':1,'pg-info':2};
+  if(map[id]!==undefined) document.querySelectorAll('.nav-item')[map[id]].classList.add('active');
+}
+
+function getProd(){return products.find(p=>p.id===activeProd);}
+function fmt(n,d=4){if(isNaN(n)||n===null||n==="")return"—";return Number(n).toFixed(d).replace('.',',');}
+function fmtPct(n){return isNaN(n)?"—":(n*100).toFixed(2).replace('.',',')+"%";}
+function procOpts(sel){return PROC_IDS.map(id=>`<option value="${id}" ${id===sel?'selected':''}>${CF_PROC[id].label}</option>`).join('');}
+
+/* ── Cálculo BASE INTERMEDIÁRIA com extrapolação ── */
+function calcBase(b){
+  let cfMPraw=0, pctKnown=0;
+  MP_NAMES.forEach(m=>{const p=parseFloat(b.comp[m])||0; pctKnown+=p; cfMPraw+=p/100*CF_MP[m];});
+  const cfMP = pctKnown>0 ? cfMPraw/(pctKnown/100) : 0;
+  const procCF = CF_PROC[b.procId].val;
+  return{cfMP, cfMPraw, cfProc:procCF, total:cfMP+procCF, pctKnown, pctOthers:parseFloat(b.others)||0};
+}
+
+/* ── Cálculo PRODUTO PRINCIPAL com extrapolação ── */
+function calcMain(pr){
+  let cfMPraw=0, pctKnownMP=0;
+  MP_NAMES.forEach(m=>{const p=parseFloat(pr.mainComp[m])||0; pctKnownMP+=p; cfMPraw+=p/100*CF_MP[m];});
+  let cfBasesRaw=0, pctKnownBases=0;
+  pr.bases.forEach(b=>{
+    const pct=parseFloat(pr.mainBases[b.id])||0;
+    const bc=calcBase(b);
+    cfBasesRaw+=pct/100*bc.total;
+    pctKnownBases+=pct;
+  });
+  const pctKnown = pctKnownMP + pctKnownBases;
+  const totalRaw = cfMPraw + cfBasesRaw;
+  const cfMPandBases = pctKnown>0 ? totalRaw/(pctKnown/100) : 0;
+  const procCF = CF_PROC[pr.mainProcId].val;
+  return{cfMPandBases, totalRaw, cfProc:procCF, total:cfMPandBases+procCF, pctKnown, pctOthers:parseFloat(pr.mainOthers)||0};
+}
+
+function addProduct(){
+  const name=prompt("Nome do produto (ex: BR-12345 — Aroma de Baunilha):","Novo produto");
+  if(!name)return;
+  const id="prod"+prodCounter++;
+  products.push({id,name,bases:[],mainProcId:"p3",
+    mainComp:Object.fromEntries(MP_NAMES.map(m=>[m,""])),mainOthers:"",mainBases:{}});
+  activeProd=id; renderTabs(); renderProd();
+}
+function selectProd(id){activeProd=id; renderTabs(); renderProd();}
+function renderTabs(){
+  document.getElementById('prod-tabs').innerHTML=
+    products.map(p=>`<div class="prod-tab ${p.id===activeProd?'active':''}" onclick="selectProd('${p.id}')">${p.name}</div>`).join('')+
+    `<div class="prod-tab prod-tab-add" onclick="addProduct()">+ Novo produto</div>`;
+}
+
+function addBase(){
+  const pr=getProd();
+  pr.bases.push({id:"base"+baseCounter++,name:"Base "+(pr.bases.length+1),procId:"p1",
+    comp:Object.fromEntries(MP_NAMES.map(m=>[m,""])),others:""});
+  renderProd();
+}
+function removeBase(bid){const pr=getProd(); pr.bases=pr.bases.filter(b=>b.id!==bid); delete pr.mainBases[bid]; renderProd();}
+function updateBase(bid,f,v){const pr=getProd(); const b=pr.bases.find(x=>x.id===bid); if(b){b[f]=v; renderProd();}}
+function updateBaseComp(bid,mp,v){const pr=getProd(); const b=pr.bases.find(x=>x.id===bid); if(b){b.comp[mp]=v; renderProd();}}
+function updateMain(f,v){const pr=getProd(); pr[f]=v; renderProd();}
+function updateMainComp(mp,v){const pr=getProd(); pr.mainComp[mp]=v; renderProd();}
+function updateMainBase(bid,v){const pr=getProd(); pr.mainBases[bid]=v; renderProd();}
+function renameProd(){const pr=getProd(); if(!pr)return; const n=prompt("Novo nome:",pr.name); if(n){pr.name=n; renderTabs(); renderProd();}}
+
+function renderBaseBlock(b,idx){
+  const bc=calcBase(b);
+  const ok=bc.pctKnown>=80;
+  const rows=MP_NAMES.map(m=>`<tr>
+    <td>${m}</td>
+    <td style="text-align:right">
+      <input type="number" min="0" max="100" step="0.01" value="${b.comp[m]}" placeholder="0,00" style="width:82px"
+        onchange="updateBaseComp('${b.id}','${m}',this.value)"> %
+    </td>
+    <td style="text-align:right;font-size:12px;color:var(--muted)">${b.comp[m]?fmt(parseFloat(b.comp[m])/100*CF_MP[m],4)+" kg CO₂e":""}</td>
+  </tr>`).join('');
+  return `<div class="base-block" id="blk-${b.id}">
+    <div class="base-block-header">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="badge badge-amber">Base ${idx+1}</span>
+        <input type="text" value="${b.name}" style="font-size:13px;font-weight:500;width:220px"
+          onchange="updateBase('${b.id}','name',this.value)">
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="removeBase('${b.id}')">✕ Remover</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:.9rem;font-size:13px">
+      <span style="color:var(--muted)">Processo produtivo:</span>
+      <select onchange="updateBase('${b.id}','procId',this.value)">${procOpts(b.procId)}</select>
+    </div>
+    <table>
+      <thead><tr><th>Matéria-prima</th><th style="text-align:right">% na base</th><th style="text-align:right">Contribuição bruta</th></tr></thead>
+      <tbody>${rows}
+        <tr style="background:var(--surface-card)">
+          <td style="color:var(--muted)">Outros (sem fator de emissão)</td>
+          <td style="text-align:right"><input type="number" min="0" max="100" step="0.01" value="${b.others}" placeholder="0,00" style="width:82px" onchange="updateBase('${b.id}','others',this.value)"> %</td>
+          <td style="text-align:right;font-size:12px;color:var(--muted)">não contabilizado</td>
+        </tr>
+      </tbody>
+      <tfoot><tr>
+        <td>Total com fator de emissão</td>
+        <td style="text-align:right;color:${ok?'var(--forest)':'#a32d2d'}">${bc.pctKnown.toFixed(2).replace('.',',')}% <span class="badge ${ok?'badge-accent':'badge-muted'}" style="${ok?'':'background:#fef2f2;color:#a32d2d'}">${ok?'✓ ≥80%':'✗ <80%'}</span></td>
+        <td style="text-align:right">${fmt(bc.cfMPraw,4)} kg CO₂e</td>
+      </tr></tfoot>
+    </table>
+    <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;gap:20px;flex-wrap:wrap">
+      <span>MPs (extrapolado): <strong style="color:var(--forest)">${fmt(bc.cfMP,4)} kg CO₂e/kg</strong></span>
+      <span>Processo: <strong style="color:var(--forest)">${fmt(bc.cfProc,4)} kg CO₂e/kg</strong></span>
+      <span>CF total da base: <strong style="color:var(--dark)">${fmt(bc.total,4)} kg CO₂e/kg</strong></span>
+      <span style="font-style:italic">Bruto: ${fmt(bc.cfMPraw,4)} (${bc.pctKnown.toFixed(2).replace('.',',')}% → extrapolado para 100%)</span>
+    </div>
+    ${!ok?`<div class="alert alert-danger">⚠ A soma das matérias-primas com fator de emissão precisa atingir pelo menos 80%.</div>`:''}
+  </div>`;
+}
+
+function renderMainSection(pr){
+  const res=calcMain(pr);
+  const ok=res.pctKnown>=80;
+  const extrapFactor = res.pctKnown>0 ? 1/(res.pctKnown/100) : 1;
+
+  const mpRows=MP_NAMES.map(m=>{
+    const pct=parseFloat(pr.mainComp[m])||0;
+    const cExtrap=(pct/100*CF_MP[m])*extrapFactor;
+    return `<tr>
+    <td>${m}</td>
+    <td style="text-align:right">
+      <input type="number" min="0" max="100" step="0.001" value="${pr.mainComp[m]}" placeholder="0,000" style="width:90px"
+        onchange="updateMainComp('${m}',this.value)"> %
+    </td>
+    <td style="text-align:right;font-size:12px;color:var(--muted)">${pct?fmt(cExtrap,4)+" kg CO₂e":""}</td>
+  </tr>`;}).join('');
+
+  const baseRows=pr.bases.map(b=>{
+    const bc=calcBase(b);
+    const pct=parseFloat(pr.mainBases[b.id])||0;
+    const cExtrap=(pct/100*bc.total)*extrapFactor;
+    return `<tr>
+      <td>${b.name} <span class="badge badge-amber">base intermediária</span></td>
+      <td style="text-align:right"><input type="number" min="0" max="100" step="0.001" value="${pr.mainBases[b.id]||''}" placeholder="0,000" style="width:90px" onchange="updateMainBase('${b.id}',this.value)"> %</td>
+      <td style="text-align:right;font-size:12px;color:var(--muted)">${pct?fmt(cExtrap,4)+" kg CO₂e":""}</td>
+    </tr>`;}).join('');
+
+  const breakdown=[
+    ...MP_NAMES.filter(m=>parseFloat(pr.mainComp[m])>0).map(m=>{
+      const p=parseFloat(pr.mainComp[m])/100;
+      const c=p*CF_MP[m]*extrapFactor;
+      return `<tr>
+        <td style="color:rgba(255,255,255,.8)">${m} <span class="badge" style="background:rgba(173,207,120,.2);color:var(--accent)">MP</span></td>
+        <td style="text-align:right;color:rgba(255,255,255,.5)">${(p*100).toFixed(3).replace('.',',')}%</td>
+        <td style="text-align:right;color:rgba(255,255,255,.5)">${fmt(CF_MP[m],3)}</td>
+        <td style="text-align:right;color:#fff;font-weight:500">${fmt(c,4)}</td>
+        <td style="text-align:right;color:rgba(255,255,255,.4)">${res.total>0?fmtPct(c/res.total):"—"}</td>
+      </tr>`;
+    }),
+    ...pr.bases.filter(b=>parseFloat(pr.mainBases[b.id])>0).map(b=>{
+      const pct=parseFloat(pr.mainBases[b.id])/100;
+      const bc=calcBase(b);
+      const c=pct*bc.total*extrapFactor;
+      return `<tr>
+        <td style="color:rgba(255,255,255,.8)">${b.name} <span class="badge badge-amber">base</span></td>
+        <td style="text-align:right;color:rgba(255,255,255,.5)">${(pct*100).toFixed(3).replace('.',',')}%</td>
+        <td style="text-align:right;color:rgba(255,255,255,.5)">${fmt(bc.total,3)}</td>
+        <td style="text-align:right;color:#fff;font-weight:500">${fmt(c,4)}</td>
+        <td style="text-align:right;color:rgba(255,255,255,.4)">${res.total>0?fmtPct(c/res.total):"—"}</td>
+      </tr>`;
+    }),
+    `<tr>
+      <td style="color:rgba(255,255,255,.8)">${CF_PROC[pr.mainProcId].label} <span class="badge" style="background:rgba(20,85,89,.4);color:var(--accent)">processo</span></td>
+      <td style="text-align:right;color:rgba(255,255,255,.5)">—</td>
+      <td style="text-align:right;color:rgba(255,255,255,.5)">${fmt(CF_PROC[pr.mainProcId].val,3)}</td>
+      <td style="text-align:right;color:#fff;font-weight:500">${fmt(res.cfProc,4)}</td>
+      <td style="text-align:right;color:rgba(255,255,255,.4)">${res.total>0?fmtPct(res.cfProc/res.total):"—"}</td>
+    </tr>`
+  ].join('');
+
+  return `
+  <div class="card">
+    <div class="card-label">Processo produtivo principal</div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+      <span style="color:var(--muted)">Processo:</span>
+      <select onchange="updateMain('mainProcId',this.value)">${procOpts(pr.mainProcId)}</select>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Composição do produto principal</div>
+    <div class="rule-box">ℹ A soma das matérias-primas <strong>com fator de emissão</strong> (incluindo bases intermediárias) deve ser ≥ 80%. A contribuição mostrada já considera a extrapolação para 100%. O campo "Outros" não conta para este critério.</div>
+    <table>
+      <thead><tr><th>Ingrediente</th><th style="text-align:right">% na formulação</th><th style="text-align:right">Contribuição extrapolada (kg CO₂e/kg)</th></tr></thead>
+      <tbody>${mpRows}${baseRows}
+        <tr style="background:var(--surface-card)">
+          <td style="color:var(--muted)">Outros (sem fator de emissão)</td>
+          <td style="text-align:right"><input type="number" min="0" max="100" step="0.01" value="${pr.mainOthers}" placeholder="0,00" style="width:90px" onchange="updateMain('mainOthers',this.value)"> %</td>
+          <td style="text-align:right;font-size:12px;color:var(--muted)">não contabilizado</td>
+        </tr>
+      </tbody>
+      <tfoot><tr>
+        <td>Total com fator de emissão</td>
+        <td style="text-align:right;color:${ok?'var(--forest)':'#a32d2d'}">${res.pctKnown.toFixed(3).replace('.',',')}% <span class="badge ${ok?'badge-accent':'badge-muted'}" style="${ok?'':'background:#fef2f2;color:#a32d2d'}">${ok?'✓ ≥80%':'✗ <80%'}</span></td>
+        <td style="text-align:right">${fmt(res.cfMPandBases,4)} kg CO₂e</td>
+      </tr></tfoot>
+    </table>
+    <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);font-size:12px;color:var(--muted);font-style:italic">
+      MPs+Bases mapeadas (bruto): ${fmt(res.totalRaw,4)} kg CO₂e/kg (${res.pctKnown.toFixed(3).replace('.',',')}% → extrapolado para 100%: ${fmt(res.cfMPandBases,4)})
+    </div>
+    ${!ok?`<div class="alert alert-danger">⚠ A soma das matérias-primas com fator de emissão precisa atingir pelo menos <strong>80%</strong> para calcular o resultado.</div>`:''}
+  </div>
+  ${ok?`<div class="result-card">
+    <div class="card-label">Resultado — Pegada de carbono do produto final</div>
+    <div class="metrics" style="justify-content:center">
+      <div class="metric highlight" style="max-width:360px;text-align:center;flex:none">
+        <div class="m-label">${pr.name}</div>
+        <div class="m-val" style="font-size:38px;font-weight:300">${fmt(res.total,4)}</div>
+        <div class="m-unit">kg CO₂e / kg produto</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:.75rem;font-style:italic;text-align:center">
+      MPs+Bases: ${fmt(res.totalRaw,4)} bruto (${res.pctKnown.toFixed(2).replace('.',',')}% → extrapolado: ${fmt(res.cfMPandBases,4)}) + Processo: ${fmt(res.cfProc,4)}
+    </div>
+    <table class="result-table" style="font-size:12px">
+      <thead><tr><th>Componente</th><th style="text-align:right">% form.</th><th style="text-align:right">CF ref.</th><th style="text-align:right">Contribuição extrapolada</th><th style="text-align:right">% do total</th></tr></thead>
+      <tbody>${breakdown}</tbody>
+      <tfoot><tr><td colspan="3">Total</td><td style="text-align:right">${fmt(res.total,4)} kg CO₂e/kg</td><td style="text-align:right">100%</td></tr></tfoot>
+    </table>
+  </div>`:`<div class="alert alert-warning">⚠ Preencha a composição com pelo menos 80% de matérias-primas com fator de emissão para ver o resultado.</div>`}`;
+}
+
+function renderProd(){
+  const pr=getProd();
+  if(!pr){document.getElementById('prod-content').innerHTML=""; return;}
+  const baseIncomplete=pr.bases.some(b=>calcBase(b).pctKnown<80);
+  document.getElementById('prod-content').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
+      <h3 style="font-size:17px;font-weight:500;color:var(--forest)">${pr.name}</h3>
+      <button class="btn btn-ghost btn-sm" onclick="renameProd()">✎ Renomear</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Bases intermediárias</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Adicione uma base para cada processo intermediário que gera um ingrediente do produto final. Se não houver, pule para a composição principal.</p>
+      <div id="bases-list">${pr.bases.map((b,i)=>renderBaseBlock(b,i)).join('')}</div>
+      <button class="btn btn-accent btn-sm" onclick="addBase()">+ Adicionar base intermediária</button>
+    </div>
+    ${baseIncomplete?`<div class="alert alert-danger">⚠ Corrija as bases intermediárias (regra dos 80% não atingida) antes de configurar o produto principal.</div>`:renderMainSection(pr)}`;
+}
+
+renderTabs(); renderProd();
+</script>
+</body>
+</html>
